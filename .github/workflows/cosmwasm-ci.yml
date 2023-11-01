@@ -19,6 +19,7 @@ jobs:
     - uses: actions/checkout@v3
 
     - name: Set up cargo cache
+      id: cache-rust
       uses: actions/cache@v3
       continue-on-error: false
       with:
@@ -38,13 +39,14 @@ jobs:
         target: wasm32-unknown-unknown
         components: clippy
     
-    - name: Install Tools
+    - if: ${{ steps.cache-rust.outputs.cache-hit != 'true' }}
+      name: Install Tools
       run: | 
-        cargo install cargo-ensure-installed --force --locked
-        cargo ensure-installed --package=cosmwasm-check --version 1.4.1
-        cargo ensure-installed --package=cargo-llvm-cov --version 0.5.35
-        cargo ensure-installed --package=cargo-sbom --version 0.8.4
-        cargo ensure-installed --package=cargo-sonar --version 0.21.0
+        cargo install cargo-ensure-installed --f
+        cargo install cosmwasm-check --version 1.4.1 --locked
+        cargo install cargo-llvm-cov --version 0.5.35 --locked 
+        cargo install cargo-sbom --version 0.8.4 --locked 
+        cargo install cargo-sonar --version 0.21.0 --locked
 
     - name: Versions
       run: |
