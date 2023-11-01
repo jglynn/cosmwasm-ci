@@ -1,0 +1,84 @@
+name: cosmwasm-build-pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build-test-scan-audit:
+    name: Build, Test, Scan, Audit, Sign
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up cargo cache
+      uses: actions/cache@v3
+      continue-on-error: false
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/            
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: ${{ runner.os }}-cargo-    
+  
+    - name: Install Rust
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: 1.69.0
+        target: wasm32-unknown-unknown
+        profile: minimal
+        override: true
+        components: clippy
+    
+    - name: Install Tools
+      run: | 
+        cargo install cargo-wasm --version 0.4.1 --locked
+        cargo install cosmwasm-check --version 1.4.1 --locked
+        cargo install cargo-llvm-cov --version 0.5.35 --locked 
+        cargo install cargo-sbom --version 0.8.4 --locked 
+        cargo install cargo-sonar --version 0.21.0 --locked
+
+    - name: Versions
+      run: |
+        rustc --version
+        cargo --version
+
+    - name: Build
+      run: |
+        # cargo build --release --verbose
+        RUSTFLAGS='-C link-arg=-s' cargo wasm build
+        cosmwasm-check target/wasm32-unknown-unknown/release/cw_escrow.wasm
+
+    - name: Test
+      run: |
+        cargo test --verbose
+        cargo llvm-cov --html 
+        cargo llvm-cov report --lcov --output-path target/lcov.info
+
+    - name: Inspect
+      run: |
+        # cargo fmt --all -- --check
+        cargo clippy --message-format=json > target/clippy-report.json
+        cargo sonar --clippy-path target/clippy-report.json
+        mv sonar-issues.json target/sonar-issues.json
+
+    - name: Upload Coverage Report
+      uses: actions/upload-artifact@v2
+      with:
+        name: test-coverage
+        path: target/llvm-cov/html
+
+    - name: Scan
+      run: | 
+        cargo audit
+        cargo sbom --output-format cyclone_dx_json_1_4 > target/cdx-sbom.json
