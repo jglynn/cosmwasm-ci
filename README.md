@@ -33,7 +33,6 @@ Using toolchain plugin, install Rust v1.69 including:
 Anything we cannot get from standard toolchain we need to install manually.
 
 ```bash
-cargo install cargo-wasm --version 0.4.1 --locked
 cargo install cosmwasm-check --version 1.4.1 --locked
 cargo install cargo-llvm-cov --version 0.5.35 --locked 
 cargo install cargo-sbom --version 0.8.4 --locked 
@@ -45,8 +44,8 @@ cargo install cargo-sonar --version 0.21.0 --locked
 Build WASM and perform a cosmwasm-check
 
 ```bash
-# cargo build --release
-RUSTFLAGS='-C link-arg=-s' cargo wasm build
+# uses `wasm` alias from .carg/config
+RUSTFLAGS='-C link-arg=-s' cargo wasm
 cosmwasm-check target/wasm32-unknown-unknown/release/cw_escrow.wasm
 ```
 
