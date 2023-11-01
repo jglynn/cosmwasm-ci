@@ -32,12 +32,10 @@ jobs:
         restore-keys: ${{ runner.os }}-cargo-    
   
     - name: Install Rust
-      uses: actions-rs/toolchain@v1
+      uses: dtolnay/rust-toolchain@master
       with:
         toolchain: 1.69.0
         target: wasm32-unknown-unknown
-        profile: minimal
-        override: true
         components: clippy
     
     - name: Install Tools
