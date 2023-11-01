@@ -57,7 +57,7 @@ jobs:
 
     - name: Test
       run: |
-        cargo test --verbose
+        cargo test
         cargo llvm-cov --html 
         cargo llvm-cov report --lcov --output-path target/lcov.info
 
