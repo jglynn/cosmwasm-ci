@@ -69,7 +69,7 @@ jobs:
         mv sonar-issues.json target/sonar-issues.json
 
     - name: Upload Coverage Report
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: test-coverage
         path: target/llvm-cov/html
