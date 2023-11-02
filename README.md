@@ -2,15 +2,15 @@
 
 Rust is commonly used for writing Smart Contracts. [WHY?](https://use.ink/why-rust-for-smart-contracts/)
 
-The follow explores CI pipeline support for Rust projects that use [CosmWasm](https://github.com/CosmWasm/cosmwasm#cosmwasm) and thus compile to Web Assembly (wasm).
+The follow project explores CI pipeline support for Rust projects that use [CosmWasm](https://github.com/CosmWasm/cosmwasm#cosmwasm) and  compile to Web Assembly (wasm).
 
 ## Pipeline Phases
 
 ### Caching
 
-Much of the tooling, crates, indexing, etc. for a build can be cached.
+Much of the tooling, crates, registry indexing, and build outputs can be cached to save significant time on builds.
 
-The following is reccomened by the [GitHub Cache Action](https://github.com/actions/cache/tree/main#cache-action) for Rust/Cargo projects.
+The following is recommended by the [GitHub Cache Action](https://github.com/actions/cache/tree/main#cache-action) for Rust/Cargo projects.
 
 ```yml
     - name: Cache
@@ -30,13 +30,12 @@ The following is reccomened by the [GitHub Cache Action](https://github.com/acti
 
 ### Install Rust
 
-Using toolchain plugin, install `Rust v1.69` including: `rustc, cargo, rust-std, clippy` and target `wasm32-unknown-unknown`
+Using the `rust-toolchain` plugin, install `Rust v1.69.0` including: `rustc, cargo, rust-std, clippy` and target `wasm32-unknown-unknown`
 
 ```yml
     - name: Install Rust
-      uses: dtolnay/rust-toolchain@master
+      uses: dtolnay/rust-toolchain@1.69.0
       with:
-        toolchain: 1.69.0
         target: wasm32-unknown-unknown
         components: clippy
 ```
