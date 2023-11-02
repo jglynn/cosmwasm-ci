@@ -2,13 +2,17 @@
 
 Rust is commonly used for writing Smart Contracts. [WHY?](https://use.ink/why-rust-for-smart-contracts/)
 
-The follow project explores CI pipeline support for Rust projects that use [CosmWasm](https://github.com/CosmWasm/cosmwasm#cosmwasm) and  compile to Web Assembly (wasm).
+The follow project explores CI pipeline support for Rust projects.
+
+Specifically, Rust projects that use [CosmWasm](https://github.com/CosmWasm/cosmwasm#cosmwasm) and compile to Web Assembly (wasm).
+
+Credit: this project uses an existing contract from https://github.com/InterWasm/cw-contracts
 
 ## Pipeline Phases
 
 ### Caching
 
-Much of the tooling, crates, registry indexing, and build outputs can be cached to save significant time on builds.
+Much of the tooling, crates, registry indexing, and build output can be cached to save significant time on builds.
 
 The following is recommended by the [GitHub Cache Action](https://github.com/actions/cache/tree/main#cache-action) for Rust/Cargo projects.
 
@@ -42,9 +46,11 @@ Using the `rust-toolchain` plugin, install `Rust v1.69.0` including: `rustc, car
 
 ### Install Tools
 
-Additional tools needed for static-analysis/test-coverage/sbom/etc, need to install manually.
+Additional tools needed for static-analysis/test-coverage/sbom/etc must be installed manually.
 
-These installations use pinned versions compatible with `Rust 1.69` and also include `|| true` to avoid build failure if the installed crate is already present (via cache.)
+The installations pin versions compatible with `Rust 1.69`
+
+They also include `|| true` to avoid build failure if the installed crate is already present (via cache)
 
 ```yml
     - name: Install Tools
@@ -57,7 +63,9 @@ These installations use pinned versions compatible with `Rust 1.69` and also inc
 
 ### Build
 
-Build the project using the alias we created for `wasm` in `.cargo/config` and perform a `cosmwasm-check`
+We build the project using the alias we created for `wasm` in `.cargo/config` which targets `wasm32-unknown-unknown`
+
+We then perform a `cosmwasm-check` to determine if the binary is a proper smart contract.
 
 ```yml
     - name: Build
@@ -70,6 +78,8 @@ Build the project using the alias we created for `wasm` in `.cargo/config` and p
 
 Run tests and generate coverage reports in both HTML and LCOV formats
 
+The lcov data will eventually be shipped off to SonarQube for reporting.
+
 ```yml
     - name: Test
       run: |
@@ -80,7 +90,7 @@ Run tests and generate coverage reports in both HTML and LCOV formats
 
 ### Inspect
 
-Run static analysis scans via clipp and assemble findings in a Sonar-friendly format.
+Run static analysis scans via clippy and assemble findings in a Sonar-friendly format.
 
 ```yml
     - name: Inspect
