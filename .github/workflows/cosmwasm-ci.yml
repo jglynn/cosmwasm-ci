@@ -59,6 +59,7 @@ jobs:
     - name: Inspect
       run: |
         # cargo fmt --all -- --check
+        cargo clippy --version
         cargo clippy --message-format=json > target/clippy-report.json
         cargo sonar --clippy-path target/clippy-report.json
         mv sonar-issues.json target/sonar-issues.json
