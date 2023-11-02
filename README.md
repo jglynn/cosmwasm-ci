@@ -1,82 +1,111 @@
 # cosmwasm-ci
 
-Explore a CI pipeline for cosmwasm Smart Contracts
+Rust is commonly used for writing Smart Contracts. [WHY?](https://use.ink/why-rust-for-smart-contracts/)
+
+The follow explores CI pipeline support for Rust projects that use [CosmWasm](https://github.com/CosmWasm/cosmwasm#cosmwasm) and thus compile to Web Assembly (wasm).
 
 ## Pipeline Phases
 
 ### Caching
 
-Rust/Cargo downloads the world -- let's cache as much as we can.
+Much of the tooling, crates, indexing, etc. for a build can be cached.
 
-```bash
-~/.cargo/bin/
-~/.cargo/registry/index/
-~/.cargo/registry/cache/
-~/.cargo/git/db/
-target/  
+The following is reccomened by the [GitHub Cache Action](https://github.com/actions/cache/tree/main#cache-action) for Rust/Cargo projects.
+
+```yml
+    - name: Cache
+      id: cache-rust
+      uses: actions/cache@v3
+      continue-on-error: false
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/            
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: ${{ runner.os }}-cargo-   
 ```
 
 ### Install Rust
 
-Using toolchain plugin, install Rust v1.69 including:
+Using toolchain plugin, install `Rust v1.69` including: `rustc, cargo, rust-std, clippy` and target `wasm32-unknown-unknown`
 
-* cargo
-* clippy
-* rust-std
-* rustc
-* rust-analyzer
-* rustfmt
-* cargo-fmt
+```yml
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@master
+      with:
+        toolchain: 1.69.0
+        target: wasm32-unknown-unknown
+        components: clippy
+```
 
 ### Install Tools
 
-Anything we cannot get from standard toolchain we need to install manually.
+Additional tools needed for static-analysis/test-coverage/sbom/etc, need to install manually.
 
-```bash
-cargo install cosmwasm-check --version 1.4.1 --locked
-cargo install cargo-llvm-cov --version 0.5.35 --locked 
-cargo install cargo-sbom --version 0.8.4 --locked 
-cargo install cargo-sonar --version 0.21.0 --locked
+These installations use pinned versions compatible with `Rust 1.69` and also include `|| true` to avoid build failure if the installed crate is already present (via cache.)
+
+```yml
+    - name: Install Tools
+      run: | 
+        cargo install cosmwasm-check --version 1.4.1 --locked || true
+        cargo install cargo-llvm-cov --version 0.5.35 --locked || true
+        cargo install cargo-sbom --version 0.8.4 --locked || true
+        cargo install cargo-sonar --version 0.21.0 --locked || true
 ```
 
 ### Build
 
-Build WASM and perform a cosmwasm-check
+Build the project using the alias we created for `wasm` in `.cargo/config` and perform a `cosmwasm-check`
 
-```bash
-# uses `wasm` alias from .carg/config
-RUSTFLAGS='-C link-arg=-s' cargo wasm
-cosmwasm-check target/wasm32-unknown-unknown/release/cw_escrow.wasm
+```yml
+    - name: Build
+      run: |
+        RUSTFLAGS='-C link-arg=-s' cargo wasm
+        cosmwasm-check target/wasm32-unknown-unknown/release/cw_escrow.wasm
 ```
 
 ### Test
 
-Run tests and generate coverage reports
+Run tests and generate coverage reports in both HTML and LCOV formats
 
-```bash
-cargo test --verbose
-cargo llvm-cov --html 
-cargo llvm-cov report --lcov --output-path target/lcov.info
+```yml
+    - name: Test
+      run: |
+        cargo test
+        cargo llvm-cov --html 
+        cargo llvm-cov report --lcov --output-path target/lcov.info
 ```
 
 ### Inspect
 
-Run static analysis scans and assemble test coverage report in Sonar-friendly format.
+Run static analysis scans via clipp and assemble findings in a Sonar-friendly format.
 
-```bash
-cargo clippy --message-format=json > target/clippy-report.json
-cargo sonar --clippy-path target/clippy-report.json
-mv sonar-issues.json target/sonar-issues.json
+```yml
+    - name: Inspect
+      run: |
+        cargo clippy --message-format=json > target/clippy-report.json
+        cargo sonar --clippy-path target/clippy-report.json
+        mv sonar-issues.json target/sonar-issues.json
 ```
 
 ### Scan
 
-Perform audit (failing on any vulnerable deps) and generate a Software Bill of Materials 
+Perform an `audit` and fail on any vulnerable crates.
+Generate a Software Bill of Materials `sbom` in `CycloneDX` format
 
-```bash
-cargo audit
-cargo sbom --output-format cyclone_dx_json_1_4 > target/cdx-sbom.json  
+```yml
+    - name: Scan
+      run: | 
+        cargo audit
+        cargo sbom --output-format cyclone_dx_json_1_4 > target/cdx-sbom.json 
 ```
+
+### Publish
+
+Comming soon.
 
 ## Example Contract: Escrow
 

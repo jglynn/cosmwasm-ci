@@ -18,7 +18,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Set up cargo cache
+    - name: Cache
       id: cache-rust
       uses: actions/cache@v3
       continue-on-error: false
@@ -46,11 +46,6 @@ jobs:
         cargo install cargo-sbom --version 0.8.4 --locked || true
         cargo install cargo-sonar --version 0.21.0 --locked || true
 
-    - name: Versions
-      run: |
-        rustc --version
-        cargo --version
-
     - name: Build
       run: |
         RUSTFLAGS='-C link-arg=-s' cargo wasm
@@ -74,13 +69,6 @@ jobs:
       with:
         name: test-coverage
         path: target/llvm-cov/html
-
-    
-    - name: Update Coverage Badge
-      uses: stefanzweifel/git-auto-commit-action@v5
-      with:
-        commit_message: update coverage badge
-        file_pattern: coverage.svg
 
     - name: Scan
       run: | 
