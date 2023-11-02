@@ -39,13 +39,12 @@ jobs:
         target: wasm32-unknown-unknown
         components: clippy
     
-    - if: ${{ steps.cache-rust.outputs.cache-hit != 'true' }}
-      name: Install Tools
+    - name: Install Tools
       run: | 
-        cargo install cosmwasm-check --version 1.4.1 --locked
-        cargo install cargo-llvm-cov --version 0.5.35 --locked 
-        cargo install cargo-sbom --version 0.8.4 --locked 
-        cargo install cargo-sonar --version 0.21.0 --locked
+        cargo install cosmwasm-check --version 1.4.1 --locked || true
+        cargo install cargo-llvm-cov --version 0.5.35 --locked || true
+        cargo install cargo-sbom --version 0.8.4 --locked || true
+        cargo install cargo-sonar --version 0.21.0 --locked || true
 
     - name: Versions
       run: |
