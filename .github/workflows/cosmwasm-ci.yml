@@ -42,7 +42,6 @@ jobs:
     - if: ${{ steps.cache-rust.outputs.cache-hit != 'true' }}
       name: Install Tools
       run: | 
-        cargo install cargo-ensure-installed --f
         cargo install cosmwasm-check --version 1.4.1 --locked
         cargo install cargo-llvm-cov --version 0.5.35 --locked 
         cargo install cargo-sbom --version 0.8.4 --locked 
