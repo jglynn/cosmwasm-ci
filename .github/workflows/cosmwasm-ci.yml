@@ -74,3 +74,9 @@ jobs:
       run: | 
         cargo audit
         cargo sbom --output-format cyclone_dx_json_1_4 > target/cdx-sbom.json
+
+    - name: Assemble
+      uses: montudor/action-zip@v1
+      with:
+          args: zip -qq -r artifacts.zip target/lcov.info target/sonar-issues.json target/cdx-sbom.json target/wasm32-unknown-unknown/release/cw_escrow.wasm
+          
