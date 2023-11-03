@@ -80,23 +80,8 @@ jobs:
       with:
           args: zip -qq -r target/artifacts.zip target/lcov.info target/sonar-issues.json target/cdx-sbom.json target/wasm32-unknown-unknown/release/cw_escrow.wasm
 
-    - name: Create Release
-      uses: actions/create-release@v1
-      id: create_release
+    - name: Upload Assembly
+      uses: actions/upload-artifact@v3
       with:
-        draft: false
-        prerelease: false
-        release_name: 0.11.0-${{ github.ref }}
-        tag_name: ${{ github.ref }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.ACTION_TOKEN }}
-    
-    - name: Upload Artifact
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.ACTION_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./target/target/artifacts.zip
-        asset_name: artifacts.zip
-        asset_content_type: application/gzip
+        name: release-artifacts
+        path: target/artifacts.zip
