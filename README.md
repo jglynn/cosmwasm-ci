@@ -76,9 +76,9 @@ We then perform a `cosmwasm-check` to determine if the binary is a proper smart 
 
 ### Test
 
-Run tests and generate coverage reports in both HTML and LCOV formats
+Run tests and generate coverage reports in both `HTML` and `LCOV` formats
 
-The lcov data will eventually be shipped off to SonarQube for reporting.
+The lcov data will eventually be shipped off to `SonarQube` for reporting.
 
 ```yml
     - name: Test
@@ -90,7 +90,7 @@ The lcov data will eventually be shipped off to SonarQube for reporting.
 
 ### Inspect
 
-Run static analysis scans via clippy and assemble findings in a Sonar-friendly format.
+Run static analysis scan via `clippy` and assemble findings in a Sonar-friendly format.
 
 ```yml
     - name: Inspect
@@ -100,19 +100,28 @@ Run static analysis scans via clippy and assemble findings in a Sonar-friendly f
         mv sonar-issues.json target/sonar-issues.json
 ```
 
-### Scan
+### Audit
 
-Perform an `audit` and fail on any vulnerable crates.
+Perform an `audit` and fail/report any vulnerable crates.
+
+```yml
+    - name: Audit
+      uses: rustsec/audit-check@v1.4.1
+      with:
+        token: ${{ secrets.ACTION_TOKEN }}
+```
+
+### SBOM
+
 Generate a Software Bill of Materials `sbom` in `CycloneDX` format
 
 ```yml
     - name: Scan
       run: | 
-        cargo audit
         cargo sbom --output-format cyclone_dx_json_1_4 > target/cdx-sbom.json 
 ```
 
-### Publish
+### Assemble
 
 Comming soon.
 

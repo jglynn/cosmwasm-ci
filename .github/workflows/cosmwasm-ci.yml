@@ -70,9 +70,13 @@ jobs:
         name: test-coverage
         path: target/llvm-cov/html
 
-    - name: Scan
-      run: | 
-        cargo audit
+    - name: Audit
+      uses: rustsec/audit-check@v1.4.1
+      with:
+        token: ${{ secrets.ACTION_TOKEN }}
+
+    - name: SBOM
+      run: |
         cargo sbom --output-format cyclone_dx_json_1_4 > target/cdx-sbom.json
 
     - name: Assemble
