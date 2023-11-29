@@ -57,6 +57,7 @@ They also include `|| true` to avoid build failure if the installed crate is alr
       run: | 
         cargo install cosmwasm-check --version 1.4.1 --locked || true
         cargo install cargo-llvm-cov --version 0.5.35 --locked || true
+        cargo install cargo-audit --version 0.18.3 --locked || true
         cargo install cargo-sbom --version 0.8.4 --locked || true
         cargo install cargo-sonar --version 0.21.0 --locked || true
 ```
@@ -100,24 +101,16 @@ Run static analysis scan via `clippy` and assemble findings in a Sonar-friendly 
         mv sonar-issues.json target/sonar-issues.json
 ```
 
-### Audit
+### Scan / Audit
 
-Perform an `audit` and fail/report any vulnerable crates.
-
-```yml
-    - name: Audit
-      uses: rustsec/audit-check@v1.4.1
-      with:
-        token: ${{ secrets.ACTION_TOKEN }}
-```
-
-### SBOM
+Perform an `audit` scan and fail/report any vulnerable crates.
 
 Generate a Software Bill of Materials `sbom` in `CycloneDX` format
 
 ```yml
-    - name: Scan
+    - name: Audit
       run: | 
+        cargo audit
         cargo sbom --output-format cyclone_dx_json_1_4 > target/cdx-sbom.json 
 ```
 
