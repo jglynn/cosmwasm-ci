@@ -23,6 +23,10 @@ jobs:
       run: rustup -v
       continue-on-error: true
      
+    - name: Dump Step Output
+      id: dump
+      run: echo ${{ steps.rustup-check-1.outputs }}
+
     - name: Rustup Exists?
       id: rustup-exists
       if: ${{ steps.rustup-check-1.outcome == 'success' }}
@@ -41,5 +45,5 @@ jobs:
       
     - name: Rustup Exists?
       id: rustup-exists-2
-      if: ${{ steps.rustup-check-1.outcome == 'success' }}
+      if: ${{ steps.rustup-check-2.outcome == 'success' }}
       run: echo "Rustup does exist."
