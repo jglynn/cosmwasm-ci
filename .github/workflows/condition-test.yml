@@ -1,0 +1,45 @@
+name: condition-test
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  conditional-steps:
+    name: Conditional Steps
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Rustup Check
+      id: rustup-check-1
+      run: rustup -v
+      continue-on-error: true
+     
+    - name: Rustup Exists?
+      id: rustup-exists
+      if: steps.rustup-check-1.outcome != 'success'
+      run: "Rustup does not exist."
+
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@1.69.0
+      with:
+        target: wasm32-unknown-unknown
+        components: clippy
+    
+    - name: Rustup Check
+      id: rustup-check-2
+      run: rustup -v
+      continue-on-error: true
+      
+    - name: Rustup Exists?
+      id: rustup-exists-2
+      if: steps.rustup-check-2.outcome == 'success'
+      run: "Rustup does exist."
