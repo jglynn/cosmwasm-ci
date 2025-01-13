@@ -21,7 +21,7 @@ jobs:
     - name: Rustup Check
       id: rustup-check
       run: |
-        rustup -v || exit 1 
+        rustup -V || exit 1 
       continue-on-error: true
      
     - name: Rustup Exists?
