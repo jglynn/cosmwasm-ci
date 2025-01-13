@@ -25,8 +25,8 @@ jobs:
      
     - name: Rustup Exists?
       id: rustup-exists
-      if: steps.rustup-check-1.outcome != 'success'
-      run: echo "Rustup does not exist."
+      if: ${{ steps.rustup-check-1.outcome == 'success' }}
+      run: echo "Rustup does exist."
 
     - name: Install Rust
       uses: dtolnay/rust-toolchain@1.69.0
@@ -41,5 +41,5 @@ jobs:
       
     - name: Rustup Exists?
       id: rustup-exists-2
-      if: steps.rustup-check-2.outcome == 'success'
+      if: ${{ steps.rustup-check-1.outcome == 'success' }}
       run: echo "Rustup does exist."
