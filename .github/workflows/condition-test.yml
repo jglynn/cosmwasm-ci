@@ -19,17 +19,14 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Rustup Check
-      id: rustup-check-1
-      run: rustup -v
+      id: rustup-check
+      run: |
+        rustup -v || exit 1 
       continue-on-error: true
      
-    - name: Dump Step Output
-      id: dump
-      run: echo ${{ steps.rustup-check-1.outputs }}
-
     - name: Rustup Exists?
       id: rustup-exists
-      if: ${{ steps.rustup-check-1.outcome == 'success' }}
+      if: ${{ steps.rustup-check.outcome == 'success' }}
       run: echo "Rustup does exist."
 
     - name: Install Rust
@@ -38,12 +35,13 @@ jobs:
         target: wasm32-unknown-unknown
         components: clippy
     
-    - name: Rustup Check
-      id: rustup-check-2
-      run: rustup -v
+    - name: Invalid Command Check
+      id: invalid-command
+      run: |
+        invalid_command || exit 1
       continue-on-error: true
-      
-    - name: Rustup Exists?
-      id: rustup-exists-2
-      if: ${{ steps.rustup-check-2.outcome == 'success' }}
-      run: echo "Rustup does exist."
+       
+    - name: Invalid-command Exists?
+      id: invalid-command-check
+      if: ${{ steps.invalid-command.outcome == 'failure' }}
+      run: echo "invalid-command does not exist."
