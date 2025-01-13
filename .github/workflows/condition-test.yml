@@ -26,7 +26,7 @@ jobs:
      
     - name: Rustup Exists?
       id: rustup-exists
-      if: ${{ steps.rustup-check.outcome == 'success' }}
+      if: steps.rustup-check.outcome == 'success'
       run: echo "Rustup does exist."
 
     - name: Install Rust
@@ -43,5 +43,5 @@ jobs:
        
     - name: Invalid-command Exists?
       id: invalid-command-check
-      if: ${{ steps.invalid-command.outcome == 'failure' }}
+      if: steps.invalid-command.outcome == 'failure'
       run: echo "invalid-command does not exist."
