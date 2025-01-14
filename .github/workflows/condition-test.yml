@@ -20,28 +20,30 @@ jobs:
 
     - name: Rustup Check
       id: rustup-check
+      shell: bash
       run: |
-        rustup -V || exit 1 
-      continue-on-error: true
+        if ! command -v rustup &> /dev/null ; then
+          echo "has-rustup=false" >> $GITHUB_OUTPUT
+        else
+          echo "has-rustup=true" >> $GITHUB_OUTPUT
+        fi
      
     - name: Rustup Exists?
       id: rustup-exists
-      if: steps.rustup-check.outcome == 'success'
+      if: steps.rustup-check.outputs.has-rustup
       run: echo "Rustup does exist."
 
-    - name: Install Rust
-      uses: dtolnay/rust-toolchain@1.69.0
-      with:
-        target: wasm32-unknown-unknown
-        components: clippy
-    
     - name: Invalid Command Check
-      id: invalid-command
-      run: |
-        invalid_command || exit 1
-      continue-on-error: true
-       
-    - name: Invalid-command Exists?
       id: invalid-command-check
-      if: steps.invalid-command.outcome == 'failure'
-      run: echo "invalid-command does not exist."
+      shell: bash
+      run: |
+        if ! command -v foobar &> /dev/null ; then
+          echo "has-foobar=false" >> $GITHUB_OUTPUT
+        else
+          echo "has-foobar=true" >> $GITHUB_OUTPUT
+        fi
+       
+    - name: Command Exists?
+      id: command-exists
+      if: steps.invalid-command-check.outputs.has-foobar
+      run: echo "Foobar does exist."
