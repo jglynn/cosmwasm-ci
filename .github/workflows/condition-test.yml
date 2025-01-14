@@ -30,7 +30,7 @@ jobs:
      
     - name: Rustup Exists?
       id: rustup-exists
-      if: ${{steps.rustup-check.outputs.has-rustup == true}}
+      if: ${{steps.rustup-check.outputs.has-rustup == 'true'}}
       run: echo "Rustup does exist."
 
     - name: Invalid Command Check
@@ -45,5 +45,5 @@ jobs:
        
     - name: Command Exists?
       id: command-exists
-      if: ${{steps.invalid-command-check.outputs.has-foobar == true}}
+      if: ${{steps.invalid-command-check.outputs.has-foobar == 'true'}}
       run: echo "Foobar does exist."
