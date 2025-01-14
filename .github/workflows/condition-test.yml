@@ -22,7 +22,7 @@ jobs:
       id: rustup-check
       shell: bash
       run: |
-        if ! command -v foobar 2>&1 >/dev/null then
+        if ! command -v foobar 2>&1 >/dev/null; then
           echo "has-rustup=false" >> $GITHUB_OUTPUT
         else
           echo "has-rustup=true" >> $GITHUB_OUTPUT
@@ -37,7 +37,7 @@ jobs:
       id: invalid-command-check
       shell: bash
       run: |
-        if ! command -v foobar 2>&1 >/dev/null then
+        if ! command -v foobar 2>&1 >/dev/null; then
           echo "has-foobar=false" >> $GITHUB_OUTPUT
         else
           echo "has-foobar=true" >> $GITHUB_OUTPUT
