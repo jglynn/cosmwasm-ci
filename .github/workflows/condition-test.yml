@@ -22,7 +22,7 @@ jobs:
       id: rustup-check
       shell: bash
       run: |
-        if ! command -v rustup &> /dev/null ; then
+        iif ! command -v foobar 2>&1 >/dev/null then
           echo "has-rustup=false" >> $GITHUB_OUTPUT
         else
           echo "has-rustup=true" >> $GITHUB_OUTPUT
@@ -30,14 +30,14 @@ jobs:
      
     - name: Rustup Exists?
       id: rustup-exists
-      if: steps.rustup-check.outputs.has-rustup
+      if: ${{steps.rustup-check.outputs.has-rustup == true}}
       run: echo "Rustup does exist."
 
     - name: Invalid Command Check
       id: invalid-command-check
       shell: bash
       run: |
-        if ! command -v foobar &> /dev/null ; then
+        if ! command -v foobar 2>&1 >/dev/null then
           echo "has-foobar=false" >> $GITHUB_OUTPUT
         else
           echo "has-foobar=true" >> $GITHUB_OUTPUT
@@ -45,5 +45,5 @@ jobs:
        
     - name: Command Exists?
       id: command-exists
-      if: steps.invalid-command-check.outputs.has-foobar
+      if: ${{steps.invalid-command-check.outputs.has-foobar == true}}
       run: echo "Foobar does exist."
